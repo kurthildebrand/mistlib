@@ -1,0 +1,3 @@
+[submodule "tests/tharness"]
+	path = tests/tharness
+	url = https://github.com/kurthildebrand/tharness.git

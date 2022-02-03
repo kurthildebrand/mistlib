@@ -1,0 +1,8 @@
+bin/
+obj/
+build/
+.vscode/ipch/
+*.depend
+*.layout
+*.out
+.DS_Store
