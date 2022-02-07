@@ -19,6 +19,7 @@ target_sources(run-mistlib-tests PRIVATE
 	test_byteorder.c
 	test_calc.c
 	test_heap.c
+	test_icmp6.c
 	test_ieee_802_15_4.c
 	test_insertsort.c
 	test_ipv6.c
@@ -27,6 +28,7 @@ target_sources(run-mistlib-tests PRIVATE
 	test_list.c
 	test_map.c
 	test_matrix.c
+	test_ndp.c
 	test_order.c
 	test_pool.c
 	test_queue.c

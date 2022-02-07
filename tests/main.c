@@ -44,8 +44,6 @@ typedef struct {
 
 int main()
 {
-	printf("This is a test\n");
-
 	srand(time(0));
 
 	tharness_init(false);

@@ -337,7 +337,7 @@ TEST(test_ndp_redir)
 
 	EXPECT(memcmp(expected2, ndp_packet_data2, sizeof(expected2)) == 0);
 
-	hexdump(ndp_packet_data2, ipv6_length(&ndp_packet2), 16);
+	// hexdump(ndp_packet_data2, ipv6_length(&ndp_packet2), 16);
 }
 
 

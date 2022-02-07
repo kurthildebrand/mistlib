@@ -22,6 +22,10 @@
 #include "tharness.h"
 
 
+/* Private Functions ----------------------------------------------------------------------------- */
+static void hexdump(const void* data, unsigned len, unsigned linelen);
+
+
 /* Private Variables ----------------------------------------------------------------------------- */
 uint8_t ipv6_packet_data[128];
 IPPacket packet;
@@ -327,6 +331,18 @@ TEST(test_ipv6_option)
 	EXPECT(ipv6_eh_prepend(&header, IPV6_HBH, 0, 0));
 
 	option = ipv6_opt_first(&header);
+
+	while(ipv6_opt_is_valid(&option))
+	{
+		if(ipv6_opt_type(&option) == 0x22)
+		{
+			break;
+		}
+
+		ipv6_opt_next(&option);
+	}
+
+	// option = ipv6_opt_first(&header);
 	EXPECT(ipv6_opt_append(&option, 0xEE, ipv6_data7, sizeof(ipv6_data7), 4, 2));
 	ipv6_opt_finalize(&option);
 
@@ -406,6 +422,107 @@ TEST(test_ipv6_option)
 }
 
 
+TEST(test_ipv6_bug1)
+{
+	IPPacket temp;
+
+	uint8_t orig[256] = {
+		0x60,0x0d,0xf0,0x82,0x00,0x30,0x3a,0xff,
+		0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,
+		0x88,0x99,0xAA,0xBB,0xCC,0xDD,0xEE,0xFF,
+		0xFF,0xEE,0xDD,0xCC,0xBB,0xAA,0x99,0x88,
+		0x77,0x66,0x55,0x44,0x33,0x22,0x11,0x00,
+		0x86,0x00,0xd6,0x34,0x40,0x00,0x00,0x1e,
+		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		0x03,0x04,0x40,0xe0,0x00,0x01,0x51,0x80,
+		0x00,0x00,0x38,0x40,0x00,0x00,0x00,0x00,
+		0xFD,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+	};
+
+	ipv6_init(&temp, orig, 88, sizeof(orig));
+
+	IPExthdr eh = ipv6_eh_first(&temp);
+	if(ipv6_eh_type(&eh) != IPV6_HBH)
+	{
+		ipv6_eh_prepend(&eh, IPV6_HBH, 0, 0);
+	}
+
+	/* Search for existing hyperspace option */
+	IPOption opt = ipv6_opt_first(&eh);
+
+	while(ipv6_opt_is_valid(&opt))
+	{
+		if(ipv6_opt_type(&opt) == 0x22)
+		{
+			break;
+		}
+
+		ipv6_opt_next(&opt);
+	}
+
+	if(!ipv6_opt_is_valid(&opt))
+	{
+		uint8_t temp[20] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19 };
+		EXPECT(ipv6_opt_append(&opt, 0x22, temp, sizeof(temp), 4, 2));
+		ipv6_opt_finalize(&opt);
+	}
+
+	ipv6_eh_finalize(&eh);
+}
+
+
+TEST(test_ipv6_bug2)
+{
+	IPPacket temp;
+
+	uint8_t orig[256] = {
+		0x60,0x00,0x00,0x00,0x00,0x24,0x00,0x01,
+		0x00,0x11,0x22,0x33,0x44,0x55,0x66,0x77,
+		0x88,0x99,0xAA,0xBB,0xCC,0xDD,0xEE,0xFF,
+		0xFF,0xEE,0xDD,0xCC,0xBB,0xAA,0x99,0x88,
+		0x77,0x66,0x55,0x44,0x33,0x22,0x11,0x00,
+		0x3A,0x00,0x05,0x02,0x00,0x00,0x01,0x00,
+		0x8F,0x00,0xD4,0xF2,0x00,0x00,0x00,0x01,
+		0x04,0x00,0x00,0x00,0xFF,0x02,0x00,0x00,
+		0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		0x00,0x00,0x00,0x02,
+	};
+
+	// hexdump(orig, 76, 16);
+
+	ipv6_init(&temp, orig, 76, sizeof(orig));
+
+	IPExthdr eh = ipv6_eh_first(&temp);
+	if(ipv6_eh_type(&eh) != IPV6_HBH)
+	{
+		ipv6_eh_prepend(&eh, IPV6_HBH, 0, 0);
+	}
+
+	/* Search for existing hyperspace option */
+	IPOption opt = ipv6_opt_first(&eh);
+
+	while(ipv6_opt_is_valid(&opt))
+	{
+		if(ipv6_opt_type(&opt) == 0x22)
+		{
+			break;
+		}
+
+		ipv6_opt_next(&opt);
+	}
+
+	if(!ipv6_opt_is_valid(&opt))
+	{
+		uint8_t temp[20] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19 };
+		EXPECT(ipv6_opt_append(&opt, 0x22, temp, sizeof(temp), 4, 2));
+		ipv6_opt_finalize(&opt);
+	}
+
+	ipv6_eh_finalize(&eh);
+}
+
+
 void test_ipv6()
 {
 	IPExthdr header;
@@ -416,6 +533,8 @@ void test_ipv6()
 	tharness_run(test_ipv6_set);
 	tharness_run(test_ipv6_ext_hdr);
 	tharness_run(test_ipv6_option);
+	tharness_run(test_ipv6_bug1);
+	tharness_run(test_ipv6_bug2);
 
 //	ipv6_finalize(&packet);
 
@@ -437,6 +556,44 @@ void test_ipv6()
 		}
 
 		ipv6_eh_next(&header);
+	}
+}
+
+
+static void hexdump(const void* data, unsigned len, unsigned linelen)
+{
+	const uint8_t* ptr = data;
+
+	unsigned i,j;
+
+	for(i = 0; i < len; i += linelen)
+	{
+		/* Address */
+		printf("%04X ", i);
+
+		/* One line of bytes */
+		for(j = 0; j < linelen; j++)
+		{
+			if(i + j >= len) {
+				printf("   ");
+			} else {
+				printf("%02X ", ptr[i+j]);
+			}
+		}
+
+		/* Character representation of bytes */
+		for(j = 0; j < linelen; j++)
+		{
+			if(i + j >= len) {
+				break;
+			} else if(ptr[i+j] < ' ' || ptr[i+j] > '~') {
+				printf(".");
+			} else {
+				printf("%c", ptr[i+j]);
+			}
+		}
+
+		printf("\n");
 	}
 }
 

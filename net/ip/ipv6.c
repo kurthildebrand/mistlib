@@ -781,18 +781,18 @@ static uint8_t ipv6_opt_read_type(const Buffer* b, const uint8_t* start)
 
 /* ipv6_opt_read_length *************************************************************************//**
  * @brief		Reads the length from the option pointed to by start. */
-static uint8_t ipv6_opt_read_length(const Buffer* b, uint8_t* start, uint8_t type)
+static uint8_t ipv6_opt_read_length(const Buffer* parent, uint8_t* start, uint8_t type)
 {
-	if(!buffer_is_valid(b) || type == IPV6_OPT_TYPE_INVALID)
+	if(!buffer_is_valid(parent) || type == IPV6_OPT_TYPE_INVALID)
 	{
 		return 0;
 	}
 
-	IPExthdr* eh = (IPExthdr*)buffer_parent(b);
+	IPExthdr* eh = (IPExthdr*)parent;
 
 	if(ipv6_eh_is_upper(ipv6_eh_type(eh)))
 	{
-		return 8 * ntoh_get_u8(buffer_peek_at(b, start + 1, 1));
+		return 8 * ntoh_get_u8(buffer_peek_at(parent, start + 1, 1));
 	}
 	else if(type == IPV6_OPT_TYPE_PAD1)
 	{
@@ -800,7 +800,7 @@ static uint8_t ipv6_opt_read_length(const Buffer* b, uint8_t* start, uint8_t typ
 	}
 	else
 	{
-		return 2 + ntoh_get_u8(buffer_peek_at(b, start + 1, 1));
+		return 2 + ntoh_get_u8(buffer_peek_at(parent, start + 1, 1));
 	}
 }
 
@@ -892,7 +892,7 @@ void ipv6_opt_finalize(IPOption* opt)
 	/* Todo: doc */
 	if(ipv6_eh_is_upper(ipv6_eh_type(eh)))
 	{
-        len = (ipv6_opt_length(opt) + 7) / 8;
+		len = (ipv6_opt_length(opt) + 7) / 8;
 	}
 	else
 	{
@@ -929,7 +929,7 @@ static void ipv6_opt_pad(IPOption* opt, uint8_t* start, unsigned len)
 	IPExthdr* eh = (IPExthdr*)buffer_parent(&opt->buffer);
 
 	/* Set the padding to zero. This implicitly sets PAD1 */
-	memset(buffer_peek_at(buffer_top_parent(&opt->buffer), start, len), 0, len);
+	memset(start, 0, len);
 
 	/* If padding is 2 or more bytes, then set PADN and the length */
 	if(!ipv6_eh_is_upper(ipv6_eh_type(eh)) && len >= 2)
