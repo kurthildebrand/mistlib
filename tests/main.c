@@ -60,6 +60,7 @@ int main()
 	test_array();
 	test_linked();
 	test_list();
+	test_lowpan();
 	test_stack();
 	test_ringbuffer();
 	test_heap();

@@ -335,70 +335,71 @@ typedef struct {
 
 
 /* Public Functions ------------------------------------------------------------------------------ */
-bool       ipv6_addr_is_unspec    (const IPAddress*);
-bool       ipv6_addr_is_loopback  (const IPAddress*);
-bool       ipv6_addr_is_link_local(const IPAddress*);
-bool       ipv6_addr_is_multicast (const IPAddress*);
-int        ipv6_addr_compare      (const void*, const void*);
+bool        ipv6_addr_is_unspec    (const IPAddress*);
+bool        ipv6_addr_is_loopback  (const IPAddress*);
+bool        ipv6_addr_is_link_local(const IPAddress*);
+bool        ipv6_addr_is_multicast (const IPAddress*);
+int         ipv6_addr_compare      (const void*, const void*);
 
-void*      ipv6_init              (IPPacket*, void*, unsigned, unsigned);
-void*      ipv6_set_length        (IPPacket*, unsigned);
-void       ipv6_parse             (IPPacket*);
-void       ipv6_clear             (IPPacket*);
-void       ipv6_finalize          (IPPacket*);
-unsigned   ipv6_length            (const IPPacket*);
-unsigned   ipv6_size              (const IPPacket*);
-uint16_t   ipv6_checksum          (const void*, unsigned, uint16_t);
-void*      ipv6_ptr_start         (const IPPacket*);
+void*       ipv6_init              (IPPacket*, void*, unsigned, unsigned);
+void*       ipv6_set_length        (IPPacket*, unsigned);
+void        ipv6_parse             (IPPacket*);
+void        ipv6_clear             (IPPacket*);
+void        ipv6_finalize          (IPPacket*);
+unsigned    ipv6_length            (const IPPacket*);
+unsigned    ipv6_size              (const IPPacket*);
+uint16_t    ipv6_checksum          (const void*, unsigned, uint16_t);
+void*       ipv6_ptr_start         (const IPPacket*);
 
-uint8_t    ipv6_version           (const IPPacket*);
-uint8_t    ipv6_traffic_class     (const IPPacket*);
-uint32_t   ipv6_flow_label        (const IPPacket*);
-uint16_t   ipv6_payload_length    (const IPPacket*);
-uint8_t    ipv6_next_header       (const IPPacket*);
-uint8_t    ipv6_hop_limit         (const IPPacket*);
-IPAddress* ipv6_src               (const IPPacket*);
-IPAddress* ipv6_dest              (const IPPacket*);
+uint8_t     ipv6_version           (const IPPacket*);
+uint8_t     ipv6_traffic_class     (const IPPacket*);
+uint32_t    ipv6_flow_label        (const IPPacket*);
+uint16_t    ipv6_payload_length    (const IPPacket*);
+uint8_t     ipv6_next_header       (const IPPacket*);
+uint8_t     ipv6_hop_limit         (const IPPacket*);
+IPAddress*  ipv6_src               (const IPPacket*);
+IPAddress*  ipv6_dest              (const IPPacket*);
 
-bool       ipv6_set_traffic_class (IPPacket*, uint8_t);
-bool       ipv6_set_flow_label    (IPPacket*, uint32_t);
-bool       ipv6_set_next_header   (IPPacket*, uint8_t);
-bool       ipv6_set_hop_limit     (IPPacket*, uint8_t);
-bool       ipv6_set_src           (IPPacket*, const IPAddress*);
-bool       ipv6_set_dest          (IPPacket*, const IPAddress*);
+bool        ipv6_set_traffic_class (IPPacket*, uint8_t);
+bool        ipv6_set_flow_label    (IPPacket*, uint32_t);
+bool        ipv6_set_next_header   (IPPacket*, uint8_t);
+bool        ipv6_set_hop_limit     (IPPacket*, uint8_t);
+bool        ipv6_set_src           (IPPacket*, const IPAddress*);
+bool        ipv6_set_dest          (IPPacket*, const IPAddress*);
 
 
 /* IPv6 Extension Headers ------------------------------------------------------------------------ */
-bool       ipv6_eh_can_frag       (uint8_t);
-bool       ipv6_eh_is_upper       (uint8_t);
+bool        ipv6_eh_can_frag       (uint8_t);
+bool        ipv6_eh_is_upper       (uint8_t);
 
-IPPacket*  ipv6_eh_pkt            (const IPExthdr*);
-IPExthdr   ipv6_eh_first          (IPPacket*);
-bool       ipv6_eh_next           (IPExthdr*);
-bool       ipv6_eh_is_valid       (const IPExthdr*);
-uint8_t    ipv6_eh_type           (const IPExthdr*);
-uint16_t   ipv6_eh_length         (const IPExthdr*);
-uint16_t   ipv6_eh_length_content (const IPExthdr*);
+IPPacket*   ipv6_eh_pkt            (const IPExthdr*);
+IPExthdr    ipv6_eh_first          (IPPacket*);
+IPExthdr    ipv6_eh_read_first     (Buffer*, uint8_t*, uint8_t*);
+bool        ipv6_eh_next           (IPExthdr*);
+bool        ipv6_eh_is_valid       (const IPExthdr*);
+uint8_t     ipv6_eh_type           (const IPExthdr*);
+uint16_t    ipv6_eh_length         (const IPExthdr*);
+uint16_t    ipv6_eh_length_content (const IPExthdr*);
 
-bool       ipv6_eh_prepend        (IPExthdr*, uint8_t, const void*, unsigned);
-bool       ipv6_eh_append         (IPExthdr*, uint8_t, const void*, unsigned);
-// Buffer*    ipv6_eh_buffer         (IPExthdr*);
-Buffer*    ipv6_eh_reset_buffer   (IPExthdr*);
-void       ipv6_eh_finalize       (IPExthdr*);
+bool        ipv6_eh_prepend        (IPExthdr*, uint8_t, const void*, unsigned);
+bool        ipv6_eh_append         (IPExthdr*, uint8_t, const void*, unsigned);
+// Buffer*     ipv6_eh_buffer         (IPExthdr*);
+Buffer*     ipv6_eh_reset_buffer   (IPExthdr*);
+void        ipv6_eh_finalize       (IPExthdr*);
 
 
 /* IPv6 TLV Options ------------------------------------------------------------------------------ */
-IPOption   ipv6_opt_read          (const Buffer*, uint8_t*);
-IPOption   ipv6_opt_first         (const IPExthdr*);
-bool       ipv6_opt_next          (IPOption*);
-bool       ipv6_opt_is_valid      (const IPOption*);
-uint8_t    ipv6_opt_type          (const IPOption*);
-uint8_t    ipv6_opt_length        (const IPOption*);
+IPOption    ipv6_opt_read          (const Buffer*, uint8_t*);
+IPOption    ipv6_opt_first         (const IPExthdr*);
+bool        ipv6_opt_next          (IPOption*);
+bool        ipv6_opt_is_valid      (const IPOption*);
+uint8_t     ipv6_opt_type          (const IPOption*);
+uint8_t     ipv6_opt_length        (const IPOption*);
 
-bool       ipv6_opt_append        (IPOption*, uint8_t, const void*, unsigned, unsigned, unsigned);
-// Buffer*    ipv6_opt_buffer        (IPOption*);
-Buffer*    ipv6_opt_reset_buffer  (IPOption*);
-void       ipv6_opt_finalize      (IPOption*);
+bool        ipv6_opt_append        (IPOption*, uint8_t, const void*, unsigned, unsigned, unsigned);
+// Buffer*     ipv6_opt_buffer        (IPOption*);
+Buffer*     ipv6_opt_reset_buffer  (IPOption*);
+void        ipv6_opt_finalize      (IPOption*);
 
 
 /* IPv6 Fragment Header -------------------------------------------------------------------------- */
@@ -407,12 +408,12 @@ void       ipv6_opt_finalize      (IPOption*);
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  * |                         Identification                        |
  * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+ */
-bool       ipv6_frag_eh_prepend   (IPExthdr*, uint32_t, uint16_t);
-bool       ipv6_frag_eh_append    (IPExthdr*, uint32_t, uint16_t);
-bool       ipv6_frag_eh_finalize  (IPExthdr*, uint16_t);
-uint16_t   ipv6_frag_eh_offset    (const IPExthdr*);
-bool       ipv6_frag_eh_is_last   (const IPExthdr*);
-uint32_t   ipv6_frag_eh_id        (const IPExthdr*);
+bool        ipv6_frag_eh_prepend   (IPExthdr*, uint32_t, uint16_t);
+bool        ipv6_frag_eh_append    (IPExthdr*, uint32_t, uint16_t);
+bool        ipv6_frag_eh_finalize  (IPExthdr*, uint16_t);
+uint16_t    ipv6_frag_eh_offset    (const IPExthdr*);
+bool        ipv6_frag_eh_is_last   (const IPExthdr*);
+uint32_t    ipv6_frag_eh_id        (const IPExthdr*);
 
 
 #ifdef __cplusplus

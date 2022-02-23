@@ -8,9 +8,7 @@ set_property(TARGET mistlib PROPERTY VERSION ${PROJECT_VERSION})
 set_property(TARGET mistlib PROPERTY C_STANDARD 11)
 set_property(TARGET mistlib PROPERTY C_STANDARD_REQUIRED ON)
 set_property(TARGET mistlib PROPERTY C_EXTENSIONS OFF)
-set_property(TARGET mistlib PROPERTY CMAKE_C_COMPILER clang)
 
-target_compile_options(mistlib PRIVATE -Wall -Wextra -pedantic)
 target_compile_definitions(mistlib PUBLIC _ANSI_SOURCE)
 
 target_include_directories(mistlib PRIVATE ./)
@@ -22,7 +20,7 @@ target_include_directories(mistlib PUBLIC
 	types/
 )
 
-target_sources(mistlib PRIVATE
+target_sources(mistlib PUBLIC
 	algorithms/byteorder.c
 	algorithms/calc.c
 	algorithms/insertsort.c
@@ -34,6 +32,7 @@ target_sources(mistlib PRIVATE
 	net/ip/ipv6.c
 	net/ip/icmp6.c
 	net/ip/ndp.c
+	net/lowpan.c
 	types/array.c
 	types/bits.c
 	types/buffer.c
@@ -51,9 +50,3 @@ target_sources(mistlib PRIVATE
 	types/ringbuffer.c
 	types/stack.c
 )
-
-add_subdirectory(tests)
-
-enable_testing()
-
-add_test(NAME test-mistlib COMMAND run-mistlib-tests)

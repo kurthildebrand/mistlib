@@ -100,7 +100,16 @@ int ipv6_addr_compare(const void* a, const void* b)
  * @brief		Initializes a packet's data. */
 void* ipv6_init(IPPacket* pkt, void* data, unsigned count, unsigned size)
 {
-	return buffer_init(&pkt->buffer, data, count, size);
+	void* ptr = buffer_init(&pkt->buffer, data, count, size);
+
+	if(ptr)
+	{
+		memset(pkt->fragments, 0, sizeof(pkt->fragments));
+	}
+
+	return ptr;
+
+	// return buffer_init(&pkt->buffer, data, count, size);
 }
 
 
@@ -128,6 +137,8 @@ void ipv6_clear(IPPacket* pkt)
 {
 	buffer_clear(&pkt->buffer);
 	buffer_set_length(&pkt->buffer, 40);
+	memset(pkt->fragments, 0, sizeof(pkt->fragments));
+
 	ipv6_set_version(pkt);
 	ipv6_set_next_header(pkt, IPV6_NO_NEXT_HEADER);
 }
@@ -419,15 +430,26 @@ IPPacket* ipv6_eh_pkt(const IPExthdr* eh)
  * @brief		Returns the first extension header in the packet. */
 IPExthdr ipv6_eh_first(IPPacket* packet)
 {
-	IPExthdr eh;
-
 	uint8_t* prev  = buffer_offset(&packet->buffer, 6);
 	uint8_t* start = buffer_offset(&packet->buffer, 40);
-	uint8_t  type  = ipv6_eh_read_next_hdr(&packet->buffer, prev);
-	unsigned len   = ipv6_eh_read_length(&packet->buffer, start, type);
+	return ipv6_eh_read_first(&packet->buffer, prev, start);
+}
+
+
+/* ipv6_eh_read_first ***************************************************************************//**
+ * @brief		Reads the first IPv6 extension header from the underlying buffer. Use case: reading
+ * 				extension headers from packets that are not necessarily IPv6 packets, for example
+ * 				6LoWPAN compressed IPv6 packets. */
+IPExthdr ipv6_eh_read_first(Buffer* buffer, uint8_t* prev, uint8_t* start)
+{
+	IPExthdr eh;
+
+	uint8_t  type = ipv6_eh_read_next_hdr(buffer, prev);
+	unsigned len  = ipv6_eh_read_length(buffer, start, type);
 
 	eh.prev = prev;
-	buffer_slice(&eh.buffer, &packet->buffer, start, len);
+
+	buffer_slice(&eh.buffer, buffer, start, len);
 	ipv6_eh_reset_buffer(&eh);
 	return eh;
 }
@@ -505,7 +527,7 @@ static uint8_t ipv6_eh_read_next_hdr(const Buffer* b, const uint8_t* start)
  * @brief		Reads the length of the extension header pointed to by start. */
 static uint16_t ipv6_eh_read_length(const Buffer* b, const uint8_t* start, uint8_t type)
 {
-	// uint8_t length = 0;
+	uint8_t length = 0;
 
 	if(!buffer_is_valid(b) || type == IPV6_NO_NEXT_HEADER || type == IPV6_INVALID)
 	{
@@ -519,16 +541,17 @@ static uint16_t ipv6_eh_read_length(const Buffer* b, const uint8_t* start, uint8
 	{
 		return 8;
 	}
+
+	void* ptr = buffer_peek_at(b, start + 1, 1);
+
+	if(!ptr)
+	{
+		return 0;
+	}
 	else
 	{
-		/* Note: start is the start of the EH */
-		// buffer_read_at(b, &length, start + 1, 1);
-
-		return 8 + 8 * ntoh_get_u8(buffer_peek_at(b, start + 1, 1));
+		return 8 + 8 * ntoh_get_u8(ptr);
 	}
-
-	// return 8 + 8 * length;
-
 }
 
 

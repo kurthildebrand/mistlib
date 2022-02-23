@@ -10,11 +10,11 @@
 			"request": "launch",
 			"preLaunchTask": "build-debug",
 			"windows": {
-				"program": "${workspaceFolder}\\build\\tests\\run-mistlib-tests.exe",
-				
+				"program": "${workspaceFolder}\\tests\\build\\run-mistlib-tests.exe",
+				"MIMode": "gdb"
 			},
 			"osx": {
-				"program": "${workspaceRoot}/build/tests/run-mistlib-tests",
+				"program": "${workspaceRoot}/tests/build/run-mistlib-tests",
 				"MIMode": "lldb"
 			},
 			"args": [],

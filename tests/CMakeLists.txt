@@ -9,7 +9,7 @@ add_subdirectory(tharness)
 target_include_directories(run-mistlib-tests PRIVATE ./)
 target_include_directories(run-mistlib-tests PRIVATE tharness)
 
-set_property(TARGET run-mistlib-tests PROPERTY CMAKE_BUILD_TYPE Debug)
+target_compile_options(run-mistlib-tests PRIVATE -Wall -Wextra -pedantic)
 
 target_sources(run-mistlib-tests PRIVATE
 	main.c
@@ -26,6 +26,7 @@ target_sources(run-mistlib-tests PRIVATE
 	test_json.c
 	test_linked.c
 	test_list.c
+	test_lowpan.c
 	test_map.c
 	test_matrix.c
 	test_ndp.c
@@ -39,5 +40,8 @@ target_sources(run-mistlib-tests PRIVATE
 	test_stack.c
 )
 
+enable_testing()
+add_subdirectory(../ mistlib)
 target_link_libraries(run-mistlib-tests mistlib)
 target_link_libraries(run-mistlib-tests tharness)
+add_test(NAME test-mistlib COMMAND run-mistlib-tests)

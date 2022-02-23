@@ -364,7 +364,7 @@ uint8_t* ieee154_payload_ptr(const Ieee154_Frame* frame)
 
 
 /* ieee154_reset_buffer *************************************************************************//**
- * @brief		Returns the frame's currentR buffer. The buffer's read and write pointers are reset so
+ * @brief		Returns the frame's current buffer. The buffer's read and write pointers are reset so
  * 				that bytes can be read from the start of the payload and written to the end of the
  * 				payload. */
 Buffer* ieee154_reset_buffer(Ieee154_Frame* frame)
